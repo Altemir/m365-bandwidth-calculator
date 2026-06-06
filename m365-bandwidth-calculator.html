@@ -279,6 +279,16 @@
       align-items: center;
     }
 
+    .field-row.select-row {
+      grid-template-columns: minmax(120px, 0.42fr) minmax(220px, 1fr);
+    }
+
+    .field-row.select-row select {
+      min-width: 0;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
     label {
       color: var(--cp-text);
       font-size: 13px;
@@ -578,6 +588,10 @@
         grid-template-columns: 1fr;
       }
 
+      .field-row.select-row {
+        grid-template-columns: 1fr;
+      }
+
       table {
         display: block;
         overflow-x: auto;
@@ -720,7 +734,7 @@
               <input id="meetingPercent" type="range" min="0" max="80" step="1" value="15">
             </div>
             <div class="field">
-              <div class="field-row">
+              <div class="field-row select-row">
                 <label for="videoProfile">영상 회의 품질</label>
                 <select id="videoProfile">
                   <option value="0.2,0.15">최소 / 240p 회의 (Down 0.2 / Up 0.15 Mbps)</option>
@@ -753,21 +767,21 @@
                 <label for="teamsUpdateMb">Teams 업데이트 MB/월/디바이스</label>
                 <input id="teamsUpdateMb" type="number" min="50" max="360" step="10" value="250">
               </div>
-              <span class="hint">참고 수치: 최소 50MB ~ 최대 360MB. 실제 업데이트 크기는 채널/차등 업데이트/배포 방식에 따라 달라질 수 있습니다.</span>
+              <span class="hint">참고 수치: 최소 50MB ~ 최대 360MB.</span>
             </div>
             <div class="field">
               <div class="field-row">
                 <label for="outlookUpdateMb">New Outlook MB/월/디바이스</label>
                 <input id="outlookUpdateMb" type="number" min="30" max="1500" step="10" value="360">
               </div>
-              <span class="hint">참고 수치: 최소 30MB ~ 최대 1.5GB. 신규 설치/업데이트/Store 또는 CDN 배포 방식에 따라 차이가 큽니다.</span>
+              <span class="hint">참고 수치: 최소 30MB ~ 최대 1.5GB. 신규 설치/업데이트/배포 방식에 따라 차이가 큽니다.</span>
             </div>
             <div class="field">
               <div class="field-row">
                 <label for="webviewUpdateMb">WebView2 MB/월/디바이스</label>
                 <input id="webviewUpdateMb" type="number" min="5" max="180" step="5" value="30">
               </div>
-              <span class="hint">참고 수치: 최소 5MB ~ 최대 180MB. Evergreen Runtime 상태와 설치 여부에 따라 달라질 수 있습니다.</span>
+              <span class="hint">참고 수치: 최소 5MB ~ 최대 180MB. Runtime 설치 상태와 업데이트 방식에 따라 달라질 수 있습니다.</span>
             </div>
             <div class="field">
               <div class="field-row">
@@ -922,10 +936,10 @@
           </div>
           <ul class="note-list">
             <li><strong>Teams Meeting Video:</strong> Microsoft Teams network requirements의 회의 Video per-endpoint 기준을 사용했습니다. Minimum 150/200 Kbps up/down, Recommended 2.5/4.0 Mbps up/down, Best performance 4.0/4.0 Mbps up/down. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
-            <li><strong>Town hall:</strong> eCDN 미사용 시 위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 사용했습니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Town hall:</strong> 위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 사용했습니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
             <li><strong>업데이트 용량 참고 범위:</strong> Teams 50~360MB, New Outlook 30MB~1.5GB, WebView2 5~180MB를 참고 수치로 제공합니다. 실제 용량은 배포 채널, 신규 설치 여부, 차등 업데이트, 클라이언트 상태에 따라 달라지므로 내부 배포/프록시/방화벽 로그로 보정하세요.</li>
-            <li><strong>Teams 업데이트:</strong> Teams desktop client는 월 2회 업데이트되며 Windows에서는 차등 업데이트를 다운로드합니다. 업데이트 크기는 고정 공개값이 아니므로 기본 MB 값은 조정 가능한 참고 수치입니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/teams-client-update" target="_blank" rel="noreferrer">출처</a></li>
-            <li><strong>WebView2:</strong> Evergreen Runtime은 자동 업데이트되며 Edge Stable 채널과 유사한 cadence를 따릅니다. Bootstrapper는 약 2 MB이나 Runtime payload는 환경별로 달라 기본 MB 값은 조정 가능한 참고 수치입니다. <a href="https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Teams 업데이트:</strong> Teams desktop client는 월 2회 업데이트되며 Windows에서는 차등 업데이트를 다운로드합니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/teams-client-update" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>WebView2:</strong> Runtime payload는 환경별로 달라 기본 MB 값은 조정 가능한 참고 수치입니다. <a href="https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution" target="_blank" rel="noreferrer">출처</a></li>
             <li><strong>Exchange Online, OneDrive, Teams 채팅:</strong> Microsoft는 사용자당 고정 일일 MB를 제시하지 않습니다. 본 도구의 기본값은 초기 sizing용 예시이며, Message Trace, OneDrive Sync health, Teams admin center/CQD, 프록시/방화벽 로그로 보정해야 합니다.</li>
           </ul>
         </div>
