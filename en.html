@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -162,6 +162,14 @@
     .hero-top h1 {
       margin-bottom: 0;
       white-space: nowrap;
+    }
+
+    html[lang="en"] body {
+      visibility: hidden;
+    }
+
+    html[lang="en"].translated body {
+      visibility: visible;
     }
 
     h2 {
@@ -648,8 +656,8 @@
         <div class="hero-top">
           <h1>M365 Internet Bandwidth Calculator</h1>
           <nav class="lang-toggle" aria-label="Language">
-            <a href="index.html" class="active">한국어</a>
-            <a href="en.html">English</a>
+            <a href="index.html">한국어</a>
+            <a href="en.html" class="active">English</a>
           </nav>
         </div>
         <p class="lead">
@@ -1299,6 +1307,172 @@
     document.getElementById("resetBtn").addEventListener("click", resetDefaults);
     document.getElementById("downloadBtn").addEventListener("click", downloadCsv);
     render();
+  </script>
+  <script>
+    const englishText = new Map([
+      ["사용자 수를 입력하면 Exchange Online 이메일, Teams Meeting 영상 트래픽, OneDrive 동기화, Teams 채팅/협업, Teams/New Outlook/WebView2 업데이트를 반영해 필요한 인터넷 회선 용량을 산정합니다.", "Enter the number of users to estimate required internet bandwidth for Exchange Online email, Teams meetings, OneDrive sync, Teams collaboration, and Teams/New Outlook/WebView2 updates."],
+      ["사용자 수를 입력하면 Exchange Online 이메일, Teams Meeting 영상 트래픽, OneDrive 동기화,", "Enter the number of users to estimate Exchange Online email, Teams meeting video traffic, OneDrive sync,"],
+      ["Teams 채팅/협업, Teams/New Outlook/WebView2 업데이트를 반영해 필요한 인터넷 회선 용량을 산정합니다.", "Teams chat/collaboration, and Teams/New Outlook/WebView2 update bandwidth."],
+      ["사용 전 주의사항", "Before using this simulator"],
+      ["이 결과는 초기 sizing용 추정치이며, 최종 회선 증설 결정에는 실제 트래픽 로그와 Microsoft 365 사용량 데이터를 함께 확인해야 합니다.", "These results are initial sizing estimates. Validate with real traffic logs and Microsoft 365 usage data before making final circuit decisions."],
+      ["한국어", "Korean"],
+      ["Teams 회의, OneDrive 초기 동기화, 업데이트 다운로드가 같은 시간대에 겹치면 피크가 크게 증가할 수 있습니다.", "Peaks can increase significantly when Teams meetings, initial OneDrive sync, and update downloads overlap."],
+      ["지점별 인터넷 breakout, 프록시/SSL inspection, 방화벽 처리량, Wi-Fi 품질, QoS 정책에 따라 체감 품질은 달라질 수 있습니다.", "User experience can vary by local internet breakout, proxy/SSL inspection, firewall throughput, Wi-Fi quality, and QoS policy."],
+      ["본 계산은 M365 관련 트래픽만 포함하며, 일반 웹 browsing, 다른 SaaS, 백업, VDI, 보안 에이전트 트래픽은 별도로 더해야 합니다.", "This calculator includes only M365-related traffic. Add general web browsing, other SaaS, backup, VDI, and security agent traffic separately."],
+      ["기본 수치는 일반적인 예시이며, 기업마다 솔루션 사용률과 사용 방식에 따라 크게 달라질 수 있으므로 내부 로그를 확인해 반영하는 것을 권장합니다.", "Default values are general examples. Actual values can vary significantly by solution adoption and usage patterns; adjust them using internal logs."],
+      ["권장 확보 용량", "Recommended capacity"],
+      ["피크 수요와 여유율을 포함한 인터넷 회선 기준", "Internet circuit estimate including peak demand and safety margin"],
+      ["예상 피크", "Estimated peak"],
+      ["월간 전송량", "Monthly volume"],
+      ["사용자당 평균", "Average per user"],
+      ["업데이트 피크", "Update peak"],
+      ["기본 조건", "Base assumptions"],
+      ["고객 규모와 업무 패턴을 입력하세요.", "Enter customer scale and usage pattern."],
+      ["정상", "Normal"],
+      ["주의", "Warning"],
+      ["고부하", "High load"],
+      ["M365 사용자 수", "M365 users"],
+      ["동시 사용자가 아닌 전체 라이선스/활성 사용자 수입니다.", "Total licensed/active users, not concurrent users."],
+      ["업무시간 동시 활성 비율", "Active users during business hours"],
+      ["일 업무시간", "Business hours per day"],
+      ["권장 여유율", "Safety margin"],
+      ["QoS, 순간 피크, 성장률을 위한 추가 버퍼입니다.", "Additional buffer for QoS, burst peaks, and growth."],
+      ["서비스별 사용량", "Service usage"],
+      ["기본값은 보수적인 일반 사무 환경 예시입니다.", "Defaults are conservative examples for a typical office environment."],
+      ["이메일 MB/사용자/일", "Email MB/user/day"],
+      ["Teams 채팅/협업 MB/일", "Teams chat/collaboration MB/day"],
+      ["OneDrive 변경량 MB/일", "OneDrive changed MB/day"],
+      ["OneDrive 동기화 집중 시간", "OneDrive sync window"],
+      ["Teams Meeting 동시 참가율", "Concurrent Teams meeting rate"],
+      ["영상 회의 품질", "Video meeting quality"],
+      ["최소 / 240p 회의 (Down 0.2 / Up 0.15 Mbps)", "Minimum / 240p meeting (Down 0.2 / Up 0.15 Mbps)"],
+      ["권장 / HD 회의 (Down 4.0 / Up 2.5 Mbps)", "Recommended / HD meeting (Down 4.0 / Up 2.5 Mbps)"],
+      ["최고 성능 / 고동작·손실 환경 (Down 4.0 / Up 4.0 Mbps)", "Best performance / high-motion or lossy network (Down 4.0 / Up 4.0 Mbps)"],
+      ["Microsoft Teams 회의 per-endpoint 대역폭 기준입니다.", "Based on Microsoft Teams per-endpoint meeting bandwidth."],
+      ["업데이트 조건", "Update assumptions"],
+      ["Teams, New Outlook, WebView2 업데이트 대역폭을 반영합니다.", "Includes Teams, New Outlook, and WebView2 update bandwidth."],
+      ["사용자당 디바이스", "Devices per user"],
+      ["Teams/New Outlook/WebView2 업데이트 MB", "Teams/New Outlook/WebView2 update MB"],
+      ["디바이스 1대 기준의 참고 업데이트 용량입니다.", "Reference update volume per device."],
+      ["Teams 업데이트 MB/월/디바이스", "Teams update MB/month/device"],
+      ["참고 수치: 최소 50MB ~ 최대 360MB.", "Reference range: 50MB minimum to 360MB maximum."],
+      ["New Outlook MB/월/디바이스", "New Outlook MB/month/device"],
+      ["참고 수치: 최소 30MB ~ 최대 1.5GB.", "Reference range: 30MB minimum to 1.5GB maximum."],
+      ["WebView2 MB/월/디바이스", "WebView2 MB/month/device"],
+      ["참고 수치: 최소 5MB ~ 최대 180MB.", "Reference range: 5MB minimum to 180MB maximum."],
+      ["업데이트 다운로드 집중 기간", "Update download concentration period"],
+      ["기본값 복원", "Reset defaults"],
+      ["CSV 내보내기", "Export CSV"],
+      ["Town hall 이벤트", "Town hall event"],
+      ["일반 Teams 회의와 별도로 대규모 시청 이벤트 트래픽을 산정합니다.", "Estimate large viewing event traffic separately from regular Teams meetings."],
+      ["동시 시청자 수", "Concurrent viewers"],
+      ["0이면 Town hall 트래픽을 계산에서 제외합니다.", "Set to 0 to exclude town hall traffic."],
+      ["시청자당 Mbps", "Mbps per viewer"],
+      ["표준 시청 / 2 Mbps", "Standard viewing / 2 Mbps"],
+      ["1080p 시청 / 3 Mbps", "1080p viewing / 3 Mbps"],
+      ["위치별 동시 시청자 수 기준의 참고 수치입니다.", "Reference value based on concurrent viewers per location."],
+      ["피크 대역폭 구성", "Peak bandwidth breakdown"],
+      ["동시 사용량 기준으로 서비스별 필요 Mbps를 분해합니다.", "Breaks down required Mbps by service based on concurrent usage."],
+      ["다운로드 중심 회선", "Download-focused circuit"],
+      ["OneDrive, 업데이트, 회의 수신 포함", "Includes OneDrive, updates, and meeting receive traffic"],
+      ["업로드 중심 회선", "Upload-focused circuit"],
+      ["회의 송신, OneDrive 업로드 포함", "Includes meeting send and OneDrive upload traffic"],
+      ["동시 회의 참가자", "Concurrent meeting participants"],
+      ["0 명", "0 participants"],
+      ["Teams Meeting 피크 산정 기준", "Basis for Teams meeting peak calculation"],
+      ["상세 산정표", "Detailed sizing table"],
+      ["용량 산정 근거를 서비스별로 확인할 수 있습니다.", "Review sizing assumptions by service."],
+      ["항목", "Item"],
+      ["피크 Mbps", "Peak Mbps"],
+      ["월간 GB", "Monthly GB"],
+      ["비고", "Notes"],
+      ["해석 가이드", "Interpretation guide"],
+      ["산정 결과를 네트워크 설계에 적용할 때 확인할 항목입니다.", "Items to review when applying the result to network design."],
+      ["항목 설명", "Item explanations"],
+      ["각 입력값과 결과값이 산정에서 어떤 의미를 갖는지 설명합니다.", "Explains what each input and output means in the sizing model."],
+      ["계산 대상이 되는 전체 활성 사용자입니다. 같은 사용자가 PC와 모바일을 동시에 쓰는 경우 업데이트 산정은 사용자당 디바이스 수로 보정합니다.", "Total active users included in the calculation. If one user uses both PC and mobile devices, adjust update sizing with devices per user."],
+      ["업무시간 중 이메일, Teams, OneDrive를 실제로 사용하는 사용자 비율입니다. 전체 사용자가 동시에 트래픽을 만들지 않는다는 점을 반영합니다.", "Percentage of users actively using email, Teams, and OneDrive during business hours. It reflects that not all users generate traffic simultaneously."],
+      ["일일 이메일/채팅 트래픽이 분산되는 시간입니다. 시간이 짧을수록 같은 일일 사용량도 피크 Mbps가 커집니다.", "The time window over which daily email/chat traffic is distributed. A shorter window increases peak Mbps for the same daily volume."],
+      ["순간 피크, 사용자 증가, QoS 여유, 측정 오차를 위해 피크 산정값 위에 더하는 버퍼입니다.", "Buffer added on top of estimated peak for bursts, growth, QoS headroom, and measurement error."],
+      ["Exchange Online에서 사용자 1명이 하루에 송수신/동기화하는 평균 메일 데이터입니다. 첨부파일 사용이 많으면 크게 높여야 합니다.", "Average mail data sent, received, and synchronized per Exchange Online user per day. Increase this significantly for heavy attachment usage."],
+      ["채팅, 채널 메시지, presence, 알림, 작은 파일 미리보기 등 회의 영상 외 Teams 협업 트래픽입니다.", "Teams collaboration traffic excluding meeting video, such as chat, channel messages, presence, notifications, and small file previews."],
+      ["사용자 1명이 하루 동안 업로드/다운로드/동기화하는 파일 변경량입니다. 신규 PC 배포나 Known Folder Move 초기 동기화는 별도 대량 이벤트로 봐야 합니다.", "File change volume uploaded, downloaded, or synchronized by one user per day. Treat new PC rollout or initial Known Folder Move sync as a separate bulk event."],
+      ["OneDrive 변경량이 실제로 몰려서 동기화되는 시간입니다. 출근 직후나 대량 파일 작업이 있으면 짧게 잡아 피크를 보수적으로 산정합니다.", "The concentrated time window when OneDrive changes actually sync. Use a shorter window for conservative peak sizing after sign-in or bulk file work."],
+      ["전체 사용자 중 같은 시간대에 영상회의에 참여하는 비율입니다. 회의 트래픽은 실시간성이 높아 전체 회선 sizing에 가장 큰 영향을 줄 수 있습니다.", "Percentage of all users joining video meetings at the same time. Meeting traffic is real-time and can have a major impact on circuit sizing."],
+      ["Teams 공식 per-endpoint 기준의 다운로드/업로드 Mbps입니다. 일반 HD 회의는 권장값, 대형/고동작/손실 환경은 최고 성능값을 선택합니다.", "Download/upload Mbps based on official Teams per-endpoint guidance. Use recommended values for typical HD meetings and best-performance values for large, high-motion, or lossy environments."],
+      ["업데이트를 받는 평균 디바이스 수입니다. PC만 있으면 1, PC와 보조 장비가 함께 있으면 1보다 크게 설정합니다.", "Average number of devices receiving updates. Use 1 for PC-only environments and more than 1 when users have additional devices."],
+      ["업데이트 payload가 전체 디바이스로 확산되는 기간입니다. 짧을수록 피크가 커지고, 업데이트 링/Intune/ConfigMgr/자동 업데이트 정책에 따라 달라집니다.", "The period over which update payloads spread across devices. Shorter periods increase peak demand and depend on update rings, Intune, ConfigMgr, or auto-update policy."],
+      ["다운로드/업로드 중심 회선", "Download/upload-focused circuit"],
+      ["다운로드는 회의 수신, OneDrive 다운로드, 업데이트를 중심으로 보고 업로드는 회의 송신과 OneDrive 업로드를 중심으로 산정합니다.", "Download sizing focuses on meeting receive, OneDrive download, and updates; upload sizing focuses on meeting send and OneDrive upload."],
+      ["월 22영업일 기준의 예상 M365 관련 데이터 전송량입니다. 인터넷 회선 과금이나 월간 트래픽 규모 검토에 활용합니다.", "Estimated M365-related transfer volume based on 22 business days per month. Use it to review monthly traffic scale or circuit billing impact."],
+      ["기준 수치 및 출처", "Reference values and sources"],
+      ["공식 수치가 있는 항목과 고객 환경별 가정이 필요한 항목을 구분했습니다.", "Separates official reference values from assumptions that require customer-specific adjustment."],
+      ["Microsoft Teams network requirements의 회의 Video per-endpoint 기준을 사용했습니다. Minimum 150/200 Kbps up/down, Recommended 2.5/4.0 Mbps up/down, Best performance 4.0/4.0 Mbps up/down.", "Uses Microsoft Teams network requirements for meeting video per endpoint: Minimum 150/200 Kbps up/down, Recommended 2.5/4.0 Mbps up/down, and Best performance 4.0/4.0 Mbps up/down."],
+      ["위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 일반 회의와 별도 이벤트 항목으로 사용했습니다.", "Uses approximately 2 Mbps per viewer per location, or 3 Mbps for 1080p, as a separate event item from regular meetings."],
+      ["업데이트 용량 참고 범위:", "Update volume reference ranges:"],
+      ["Teams 50~360MB, New Outlook 30MB~1.5GB, WebView2 5~180MB를 참고 수치로 제공합니다.", "Reference ranges are Teams 50~360MB, New Outlook 30MB~1.5GB, and WebView2 5~180MB."],
+      ["Teams 업데이트:", "Teams updates:"],
+      ["Teams desktop client는 월 2회 업데이트됩니다.", "The Teams desktop client is updated twice a month."],
+      ["WebView2:", "WebView2:"],
+      ["Runtime payload는 환경별로 달라 기본 MB 값은 조정 가능한 참고 수치입니다.", "Runtime payload varies by environment; the default MB value is an adjustable reference."],
+      ["Exchange Online, OneDrive, Teams 채팅:", "Exchange Online, OneDrive, Teams chat:"],
+      ["Microsoft는 사용자당 고정 일일 MB를 제시하지 않습니다. 본 도구의 기본값은 초기 sizing용 예시이며, Message Trace, OneDrive Sync health, Teams admin center/CQD, 프록시/방화벽 로그로 보정해야 합니다.", "Microsoft does not provide fixed daily MB per user. Defaults are initial sizing examples and should be adjusted using Message Trace, OneDrive Sync health, Teams admin center/CQD, and proxy/firewall logs."],
+      ["출처", "Source"],
+      ["이 계산기는 초기 sizing과 고객 대화용 예측 도구입니다. 실제 회선 설계 시 Microsoft 365 네트워크 연결 원칙, QoS, 프록시 우회, 로컬 인터넷 breakout, 사용량 로그를 함께 검토하세요.", "This calculator is an initial sizing and customer discussion tool. For actual circuit design, review Microsoft 365 connectivity principles, QoS, proxy bypass, local internet breakout, and usage logs together."]
+    ]);
+
+    const englishDynamic = new Map([
+      ["Exchange Online 이메일", "Exchange Online email"],
+      ["Teams 채팅/협업", "Teams chat/collaboration"],
+      ["OneDrive 동기화", "OneDrive sync"],
+      ["Town hall 이벤트", "Town hall event"],
+      ["Teams/New Outlook/WebView2 업데이트", "Teams/New Outlook/WebView2 updates"],
+      ["기타 M365 제어/인증 트래픽", "Other M365 control/auth traffic"],
+      ["업무시간 평균의 3배 피크", "3x business-hour average peak"],
+      ["메시지, 파일 미리보기, 알림", "Messages, file previews, notifications"],
+      ["인증, Graph, telemetry, small payload", "Auth, Graph, telemetry, small payload"],
+      ["일반 회의 사용 패턴입니다.", "Typical meeting usage pattern."],
+      ["동시 회의 참가율이 변하면 전체 권장 용량이 크게 달라지므로 실제 Teams CQD 또는 네트워크 로그로 보정하세요.", "Adjust with Teams CQD or network logs because concurrent meeting rate can significantly change recommended capacity."],
+      ["업데이트는 1일 집중 기준으로 산정합니다.", "Updates are sized as a 1-day concentrated download."],
+      ["실제 환경에서 업데이트 링이나 배포 도구로 분산 배포한다면 다운로드 집중 기간을 조정해 피크를 낮출 수 있습니다.", "If update rings or deployment tools spread downloads, adjust the concentration period to reduce peak."],
+      ["사용자당 권장 Mbps는 일반 범위입니다.", "Recommended Mbps per user is within a typical range."],
+      ["다만 무선 AP, 방화벽 처리량, SSL inspection 예외, DNS locality도 함께 확인해야 합니다.", "Also check wireless AP capacity, firewall throughput, SSL inspection exceptions, and DNS locality."],
+      ["사용자당 권장 Mbps가 높은 편입니다.", "Recommended Mbps per user is relatively high."],
+      ["OneDrive 대량 동기화, 영상 회의 품질, 업데이트 배포 시간을 분산하는 정책을 검토하세요.", "Review policies for large OneDrive sync, meeting quality, and update distribution timing."],
+      ["회선 산정 기준입니다.", "Circuit sizing scope."],
+      ["본 값은 M365 관련 인터넷 대역폭이며, 다른 SaaS, 인터넷 browsing, 백업, VDI 트래픽은 별도로 더해야 합니다.", "This value covers M365 internet bandwidth only. Add other SaaS, web browsing, backup, and VDI traffic separately."]
+    ]);
+
+    function translateTextNodes(root = document.body) {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      for (const node of nodes) {
+        const value = node.nodeValue.trim();
+        if (!value) continue;
+        const normalized = value.replace(/\s+/g, " ");
+        if (englishText.has(normalized)) node.nodeValue = node.nodeValue.replace(value, englishText.get(normalized));
+        if (englishDynamic.has(normalized)) node.nodeValue = node.nodeValue.replace(value, englishDynamic.get(normalized));
+        node.nodeValue = node.nodeValue
+          .replace(/(\d[\d,.]*)명 동시, Down/g, "$1 concurrent, Down")
+          .replace(/(\d[\d,.]*)명 동시 시청, ([\d.]+) Mbps\/명, 2시간 이벤트 기준/g, "$1 concurrent viewers, $2 Mbps/viewer, 2-hour event basis")
+          .replace(/(\d[\d,.]*) 명/g, "$1 participants")
+          .replace(/(\d+)시간 집중 동기화/g, "$1-hour sync window")
+          .replace(/(\d+)일 집중 다운로드/g, "$1-day concentrated download");
+      }
+    }
+
+    function translateEnglishPage() {
+      document.title = "M365 Internet Bandwidth Calculator";
+      translateTextNodes();
+      document.documentElement.classList.add("translated");
+    }
+
+    for (const element of Object.values(elements)) {
+      element.addEventListener("input", () => setTimeout(translateEnglishPage, 0));
+      element.addEventListener("change", () => setTimeout(translateEnglishPage, 0));
+    }
+    translateEnglishPage();
   </script>
 </body>
 </html>

@@ -25,9 +25,9 @@
       --cp-text: #242424;
       --cp-text-muted: #5c5c5c;
       --cp-text-soft: #6f6f6f;
-      --cp-accent: #b11f4b;
-      --cp-accent-hover: #9a1a41;
-      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent: #0078d4;
+      --cp-accent-hover: #106ebe;
+      --cp-accent-soft: rgba(0, 120, 212, 0.1);
       --cp-accent-fg: #ffffff;
       --cp-success: #16a34a;
       --cp-danger: #dc2626;
@@ -38,7 +38,7 @@
       --cp-panel: rgba(255, 255, 255, 0.86);
       --cp-panel-strong: rgba(255, 255, 255, 0.96);
       --cp-sheen: rgba(255, 255, 255, 0.55);
-      --cp-highlight: rgba(177, 31, 75, 0.12);
+      --cp-highlight: rgba(0, 120, 212, 0.12);
     }
     html[data-theme="dark"] {
       color-scheme: dark;
@@ -51,9 +51,9 @@
       --cp-text: #dedede;
       --cp-text-muted: #919191;
       --cp-text-soft: #b0b0b0;
-      --cp-accent: #fd8ea1;
-      --cp-accent-hover: #fb7b91;
-      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent: #4da6ff;
+      --cp-accent-hover: #3995ee;
+      --cp-accent-soft: rgba(77, 166, 255, 0.14);
       --cp-accent-fg: #1a1a1a;
       --cp-success: #4ade80;
       --cp-danger: #f87171;
@@ -64,7 +64,7 @@
       --cp-panel: rgba(41, 41, 41, 0.72);
       --cp-panel-strong: rgba(41, 41, 41, 0.96);
       --cp-sheen: rgba(255, 255, 255, 0.04);
-      --cp-highlight: rgba(253, 142, 161, 0.12);
+      --cp-highlight: rgba(77, 166, 255, 0.12);
     }
 
     * {
@@ -113,6 +113,38 @@
       position: relative;
     }
 
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      gap: 4px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+      padding: 4px;
+      white-space: nowrap;
+    }
+
+    .lang-toggle a {
+      padding: 6px 9px;
+      border-radius: 0.625rem;
+      color: var(--cp-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .lang-toggle a.active {
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
     h1,
     h2,
     h3,
@@ -121,10 +153,15 @@
     }
 
     h1 {
-      font-size: clamp(28px, 4vw, 48px);
+      font-size: clamp(24px, 2.8vw, 36px);
       line-height: 1.1;
       margin-bottom: 16px;
       letter-spacing: -0.03em;
+    }
+
+    .hero-top h1 {
+      margin-bottom: 0;
+      white-space: nowrap;
     }
 
     h2 {
@@ -592,6 +629,10 @@
         grid-template-columns: 1fr;
       }
 
+      .hero-top {
+        display: grid;
+      }
+
       table {
         display: block;
         overflow-x: auto;
@@ -604,7 +645,13 @@
   <main class="page">
     <section class="hero">
       <div class="hero-card">
-        <h1>M365 Internet Bandwidth Calculator</h1>
+        <div class="hero-top">
+          <h1>M365 Internet Bandwidth Calculator</h1>
+          <nav class="lang-toggle" aria-label="Language">
+            <a href="index.html" class="active">한국어</a>
+            <a href="en.html">English</a>
+          </nav>
+        </div>
         <p class="lead">
           사용자 수를 입력하면 Exchange Online 이메일, Teams Meeting 영상 트래픽, OneDrive 동기화,
           Teams 채팅/협업, Teams/New Outlook/WebView2 업데이트를 반영해 필요한 인터넷 회선 용량을 산정합니다.
@@ -661,7 +708,6 @@
               <h2>기본 조건</h2>
               <p>고객 규모와 업무 패턴을 입력하세요.</p>
             </div>
-            <span class="status" id="sizingStatus">정상</span>
           </div>
           <div class="form-grid">
             <div class="field">
@@ -740,7 +786,6 @@
                   <option value="0.2,0.15">최소 / 240p 회의 (Down 0.2 / Up 0.15 Mbps)</option>
                   <option value="4,2.5" selected>권장 / HD 회의 (Down 4.0 / Up 2.5 Mbps)</option>
                   <option value="4,4">최고 성능 / 고동작·손실 환경 (Down 4.0 / Up 4.0 Mbps)</option>
-                  <option value="3,0">Town hall 시청자 / 1080p (Down 3.0 Mbps)</option>
                 </select>
               </div>
               <span class="hint">Microsoft Teams 회의 per-endpoint 대역폭 기준입니다.</span>
@@ -774,14 +819,14 @@
                 <label for="outlookUpdateMb">New Outlook MB/월/디바이스</label>
                 <input id="outlookUpdateMb" type="number" min="30" max="1500" step="10" value="360">
               </div>
-              <span class="hint">참고 수치: 최소 30MB ~ 최대 1.5GB. 신규 설치/업데이트/배포 방식에 따라 차이가 큽니다.</span>
+              <span class="hint">참고 수치: 최소 30MB ~ 최대 1.5GB.</span>
             </div>
             <div class="field">
               <div class="field-row">
                 <label for="webviewUpdateMb">WebView2 MB/월/디바이스</label>
                 <input id="webviewUpdateMb" type="number" min="5" max="180" step="5" value="30">
               </div>
-              <span class="hint">참고 수치: 최소 5MB ~ 최대 180MB. Runtime 설치 상태와 업데이트 방식에 따라 달라질 수 있습니다.</span>
+              <span class="hint">참고 수치: 최소 5MB ~ 최대 180MB.</span>
             </div>
             <div class="field">
               <div class="field-row">
@@ -792,6 +837,34 @@
             <div class="actions">
               <button type="button" id="resetBtn">기본값 복원</button>
               <button type="button" class="primary" id="downloadBtn">CSV 내보내기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>Town hall 이벤트</h2>
+              <p>일반 Teams 회의와 별도로 대규모 시청 이벤트 트래픽을 산정합니다.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <div class="field-row">
+                <label for="townhallViewers">동시 시청자 수</label>
+                <input id="townhallViewers" type="number" min="0" max="500000" step="10" value="0">
+              </div>
+              <span class="hint">0이면 Town hall 트래픽을 계산에서 제외합니다.</span>
+            </div>
+            <div class="field">
+              <div class="field-row select-row">
+                <label for="townhallMbps">시청자당 Mbps</label>
+                <select id="townhallMbps">
+                  <option value="2">표준 시청 / 2 Mbps</option>
+                  <option value="3" selected>1080p 시청 / 3 Mbps</option>
+                </select>
+              </div>
+              <span class="hint">위치별 동시 시청자 수 기준의 참고 수치입니다.</span>
             </div>
           </div>
         </div>
@@ -910,7 +983,7 @@
             </div>
             <div class="explain-item">
               <strong>Teams/New Outlook/WebView2 업데이트 MB</strong>
-              <span>월간 또는 배포 주기 동안 디바이스 1대가 인터넷에서 받는 설치/업데이트 payload입니다. 실제 패키지 크기와 차등 업데이트 여부에 맞춰 조정합니다.</span>
+              <span>디바이스 1대 기준의 참고 업데이트 용량입니다.</span>
             </div>
             <div class="explain-item">
               <strong>업데이트 다운로드 집중 기간</strong>
@@ -936,9 +1009,9 @@
           </div>
           <ul class="note-list">
             <li><strong>Teams Meeting Video:</strong> Microsoft Teams network requirements의 회의 Video per-endpoint 기준을 사용했습니다. Minimum 150/200 Kbps up/down, Recommended 2.5/4.0 Mbps up/down, Best performance 4.0/4.0 Mbps up/down. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
-            <li><strong>Town hall:</strong> 위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 사용했습니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
-            <li><strong>업데이트 용량 참고 범위:</strong> Teams 50~360MB, New Outlook 30MB~1.5GB, WebView2 5~180MB를 참고 수치로 제공합니다. 실제 용량은 배포 채널, 신규 설치 여부, 차등 업데이트, 클라이언트 상태에 따라 달라지므로 내부 배포/프록시/방화벽 로그로 보정하세요.</li>
-            <li><strong>Teams 업데이트:</strong> Teams desktop client는 월 2회 업데이트되며 Windows에서는 차등 업데이트를 다운로드합니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/teams-client-update" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Town hall:</strong> 위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 일반 회의와 별도 이벤트 항목으로 사용했습니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>업데이트 용량 참고 범위:</strong> Teams 50~360MB, New Outlook 30MB~1.5GB, WebView2 5~180MB를 참고 수치로 제공합니다.</li>
+            <li><strong>Teams 업데이트:</strong> Teams desktop client는 월 2회 업데이트됩니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/teams-client-update" target="_blank" rel="noreferrer">출처</a></li>
             <li><strong>WebView2:</strong> Runtime payload는 환경별로 달라 기본 MB 값은 조정 가능한 참고 수치입니다. <a href="https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution" target="_blank" rel="noreferrer">출처</a></li>
             <li><strong>Exchange Online, OneDrive, Teams 채팅:</strong> Microsoft는 사용자당 고정 일일 MB를 제시하지 않습니다. 본 도구의 기본값은 초기 sizing용 예시이며, Message Trace, OneDrive Sync health, Teams admin center/CQD, 프록시/방화벽 로그로 보정해야 합니다.</li>
           </ul>
@@ -963,6 +1036,8 @@
       syncWindow: 4,
       meetingPercent: 15,
       videoProfile: "4,2.5",
+      townhallViewers: 0,
+      townhallMbps: 3,
       devicesPerUser: 1,
       teamsUpdateMb: 250,
       outlookUpdateMb: 360,
@@ -1005,6 +1080,8 @@
         meetingPercent: safeNumber(elements.meetingPercent.value, defaults.meetingPercent),
         videoProfile: elements.videoProfile.value,
         videoBandwidth: parseVideoProfile(elements.videoProfile.value),
+        townhallViewers: Math.max(0, safeNumber(elements.townhallViewers.value, defaults.townhallViewers)),
+        townhallMbps: Math.max(0, safeNumber(elements.townhallMbps.value, defaults.townhallMbps)),
         devicesPerUser: Math.max(0, safeNumber(elements.devicesPerUser.value, defaults.devicesPerUser)),
         teamsUpdateMb: Math.max(0, safeNumber(elements.teamsUpdateMb.value, defaults.teamsUpdateMb)),
         outlookUpdateMb: Math.max(0, safeNumber(elements.outlookUpdateMb.value, defaults.outlookUpdateMb)),
@@ -1018,6 +1095,7 @@
       const meetingUsers = input.users * (input.meetingPercent / 100);
       const meetingDownPeak = meetingUsers * input.videoBandwidth.down;
       const meetingUpPeak = meetingUsers * input.videoBandwidth.up;
+      const townhallPeak = input.townhallViewers * input.townhallMbps;
       const updateMbPerDevice = input.teamsUpdateMb + input.outlookUpdateMb + input.webviewUpdateMb;
       const devices = input.users * input.devicesPerUser;
       const updateDailyMbDuringRollout = (devices * updateMbPerDevice) / input.rolloutDays;
@@ -1054,6 +1132,12 @@
           note: `${intFormat.format(meetingUsers)}명 동시, Down ${input.videoBandwidth.down} / Up ${input.videoBandwidth.up} Mbps`
         },
         {
+          name: "Town hall 이벤트",
+          peak: townhallPeak,
+          monthlyGb: gb(townhallPeak * 3600 * 2 / 8),
+          note: `${intFormat.format(input.townhallViewers)}명 동시 시청, ${input.townhallMbps} Mbps/명, 2시간 이벤트 기준`
+        },
+        {
           name: "Teams/New Outlook/WebView2 업데이트",
           peak: updatePeak,
           monthlyGb: gb(devices * updateMbPerDevice),
@@ -1079,6 +1163,7 @@
         meetingUsers,
         meetingDownPeak,
         meetingUpPeak,
+        townhallPeak,
         peak,
         monthlyGb,
         recommended,
@@ -1139,6 +1224,7 @@
 
     function renderStatus(input, result) {
       const status = document.getElementById("sizingStatus");
+      if (!status) return;
       status.classList.remove("warn", "danger");
       if (result.perUserMbps >= 3 || input.meetingPercent >= 35) {
         status.textContent = "고부하";
