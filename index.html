@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M365 Internet Bandwidth Calculator</title>
+  <link rel="icon" href="data:,">
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("scoutTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    .hero-card,
+    .card {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 16px;
+      box-shadow: var(--cp-shadow);
+    }
+
+    .hero-card {
+      padding: 32px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: var(--cp-text-muted);
+      font-size: 17px;
+      margin-bottom: 24px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 0.625rem;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      border: 1px solid var(--cp-border);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .caution-box {
+      margin: 20px 0 20px;
+      padding: 14px 16px;
+      border: 1px solid var(--cp-border);
+      border-left: 4px solid var(--cp-warning);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+    }
+
+    .caution-box strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .caution-box ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    .caution-box li + li {
+      margin-top: 4px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .metric {
+      background: var(--cp-surface-soft);
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      padding: 14px;
+    }
+
+    .metric.full {
+      grid-column: 1 / -1;
+      background: var(--cp-accent-soft);
+      border-color: var(--cp-border-strong);
+    }
+
+    .label {
+      color: var(--cp-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .value {
+      display: block;
+      margin-top: 4px;
+      font-size: 26px;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .value.large {
+      font-size: 38px;
+      color: var(--cp-accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .controls {
+      display: grid;
+      gap: 16px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .card {
+      padding: 20px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      border-bottom: 1px solid var(--cp-border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title p {
+      margin-bottom: 0;
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 112px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    label {
+      color: var(--cp-text);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .hint {
+      color: var(--cp-text-soft);
+      font-size: 12px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 11px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-bg-elevated);
+      color: var(--cp-text);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--cp-accent);
+      box-shadow: 0 0 0 3px var(--cp-accent-soft);
+    }
+
+    input[type="range"] {
+      accent-color: var(--cp-accent);
+      padding: 0;
+      background: transparent;
+    }
+
+    .range-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      padding: 10px 12px;
+      color: var(--cp-text);
+      background: var(--cp-surface-soft);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    button.primary {
+      border-color: var(--cp-accent);
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+    }
+
+    button:hover {
+      border-color: var(--cp-accent);
+    }
+
+    button.primary:hover {
+      background: var(--cp-accent-hover);
+    }
+
+    a {
+      color: var(--cp-link);
+    }
+
+    .results {
+      display: grid;
+      gap: 24px;
+    }
+
+    .chart-card {
+      min-height: 360px;
+    }
+
+    .bars {
+      display: grid;
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 110px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .bar-name {
+      font-weight: 650;
+      font-size: 13px;
+    }
+
+    .bar-track {
+      height: 16px;
+      border-radius: 0.625rem;
+      border: 1px solid var(--cp-border);
+      background: var(--cp-surface-soft);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 2px;
+      width: 0;
+      border-radius: 0.625rem;
+      background: var(--cp-accent);
+      transition: width 180ms ease;
+    }
+
+    .bar-number {
+      color: var(--cp-text-muted);
+      font-family: Consolas, "Courier New", Courier, monospace;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .result-tile {
+      border: 1px solid var(--cp-border);
+      background: var(--cp-surface-soft);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .result-tile strong {
+      display: block;
+      font-size: 24px;
+      margin-top: 6px;
+    }
+
+    .result-tile span {
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 0.625rem;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--cp-border);
+      text-align: right;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      color: var(--cp-text-muted);
+      background: var(--cp-surface-soft);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .note-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .note-list li {
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+      padding: 12px;
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    .note-list strong {
+      color: var(--cp-text);
+    }
+
+    .explain-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .explain-item {
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      background: var(--cp-surface-soft);
+      padding: 12px;
+    }
+
+    .explain-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .explain-item span {
+      color: var(--cp-text-muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--cp-border);
+      border-radius: 0.625rem;
+      padding: 4px 8px;
+      color: var(--cp-text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 0.625rem;
+      background: var(--cp-success);
+    }
+
+    .status.warn::before {
+      background: var(--cp-warning);
+    }
+
+    .status.danger::before {
+      background: var(--cp-danger);
+    }
+
+    .footer {
+      margin-top: 24px;
+      color: var(--cp-text-muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        position: static;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 16px;
+      }
+
+      .summary,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .bar-number {
+        text-align: left;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .explain-grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>M365 Internet Bandwidth Calculator</h1>
+        <p class="lead">
+          사용자 수를 입력하면 Exchange Online 이메일, Teams Meeting 영상 트래픽, OneDrive 동기화,
+          Teams 채팅/협업, Teams/New Outlook/WebView2 업데이트를 반영해 필요한 인터넷 회선 용량을 산정합니다.
+        </p>
+        <div class="caution-box">
+          <strong>사용 전 주의사항</strong>
+          <ul>
+            <li>이 결과는 초기 sizing용 추정치이며, 최종 회선 증설 결정에는 실제 트래픽 로그와 Microsoft 365 사용량 데이터를 함께 확인해야 합니다.</li>
+            <li>Teams 회의, OneDrive 초기 동기화, 업데이트 다운로드가 같은 시간대에 겹치면 피크가 크게 증가할 수 있습니다.</li>
+            <li>지점별 인터넷 breakout, 프록시/SSL inspection, 방화벽 처리량, Wi-Fi 품질, QoS 정책에 따라 체감 품질은 달라질 수 있습니다.</li>
+            <li>본 계산은 M365 관련 트래픽만 포함하며, 일반 웹 browsing, 다른 SaaS, 백업, VDI, 보안 에이전트 트래픽은 별도로 더해야 합니다.</li>
+          </ul>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Exchange Online</span>
+          <span class="pill">Teams Video Meeting</span>
+          <span class="pill">OneDrive Sync</span>
+          <span class="pill">Teams Updates</span>
+          <span class="pill">New Outlook</span>
+          <span class="pill">WebView2 Runtime</span>
+        </div>
+      </div>
+      <div class="card summary" aria-live="polite">
+        <div class="metric full">
+          <span class="label">권장 확보 용량</span>
+          <strong class="value large" id="recommendedBandwidth">0 Mbps</strong>
+          <span class="hint">피크 수요와 여유율을 포함한 인터넷 회선 기준</span>
+        </div>
+        <div class="metric">
+          <span class="label">예상 피크</span>
+          <strong class="value" id="peakDemand">0 Mbps</strong>
+        </div>
+        <div class="metric">
+          <span class="label">월간 전송량</span>
+          <strong class="value" id="monthlyVolume">0 TB</strong>
+        </div>
+        <div class="metric">
+          <span class="label">사용자당 평균</span>
+          <strong class="value" id="perUserMbps">0 Mbps</strong>
+        </div>
+        <div class="metric">
+          <span class="label">업데이트 피크</span>
+          <strong class="value" id="updatePeak">0 Mbps</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <aside class="controls">
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>기본 조건</h2>
+              <p>고객 규모와 업무 패턴을 입력하세요.</p>
+            </div>
+            <span class="status" id="sizingStatus">정상</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <div class="field-row">
+                <label for="users">M365 사용자 수</label>
+                <input id="users" type="number" min="1" max="500000" step="1" value="1000">
+              </div>
+              <span class="hint">동시 사용자가 아닌 전체 라이선스/활성 사용자 수입니다.</span>
+            </div>
+            <div class="field">
+              <div class="range-label">
+                <label for="activePercent">업무시간 동시 활성 비율</label>
+                <strong><span id="activePercentValue">70</span>%</strong>
+              </div>
+              <input id="activePercent" type="range" min="10" max="100" step="1" value="70">
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="workHours">일 업무시간</label>
+                <input id="workHours" type="number" min="1" max="24" step="0.5" value="8">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="safetyMargin">권장 여유율</label>
+                <input id="safetyMargin" type="number" min="0" max="200" step="5" value="30">
+              </div>
+              <span class="hint">QoS, 순간 피크, 성장률을 위한 추가 버퍼입니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>서비스별 사용량</h2>
+              <p>기본값은 보수적인 일반 사무 환경 예시입니다.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <div class="field-row">
+                <label for="emailMb">이메일 MB/사용자/일</label>
+                <input id="emailMb" type="number" min="0" max="5000" step="5" value="75">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="teamsChatMb">Teams 채팅/협업 MB/일</label>
+                <input id="teamsChatMb" type="number" min="0" max="5000" step="5" value="50">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="oneDriveMb">OneDrive 변경량 MB/일</label>
+                <input id="oneDriveMb" type="number" min="0" max="20000" step="10" value="300">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="syncWindow">OneDrive 동기화 집중 시간</label>
+                <input id="syncWindow" type="number" min="0.5" max="24" step="0.5" value="4">
+              </div>
+            </div>
+            <div class="field">
+              <div class="range-label">
+                <label for="meetingPercent">Teams Meeting 동시 참가율</label>
+                <strong><span id="meetingPercentValue">12</span>%</strong>
+              </div>
+              <input id="meetingPercent" type="range" min="0" max="80" step="1" value="12">
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="videoProfile">영상 회의 품질</label>
+                <select id="videoProfile">
+                  <option value="0.2,0.15">최소 / 240p 회의 (Down 0.2 / Up 0.15 Mbps)</option>
+                  <option value="4,2.5" selected>권장 / HD 회의 (Down 4.0 / Up 2.5 Mbps)</option>
+                  <option value="4,4">최고 성능 / 고동작·손실 환경 (Down 4.0 / Up 4.0 Mbps)</option>
+                  <option value="3,0">Town hall 시청자 / 1080p (Down 3.0 Mbps)</option>
+                </select>
+              </div>
+              <span class="hint">Microsoft Teams 회의 per-endpoint 대역폭 기준입니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>업데이트 조건</h2>
+              <p>Teams, New Outlook, WebView2 업데이트 대역폭을 반영합니다.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <div class="field-row">
+                <label for="devicesPerUser">사용자당 디바이스</label>
+                <input id="devicesPerUser" type="number" min="0.1" max="10" step="0.1" value="1">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="teamsUpdateMb">Teams 업데이트 MB/월/디바이스</label>
+                <input id="teamsUpdateMb" type="number" min="0" max="5000" step="10" value="350">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="outlookUpdateMb">New Outlook MB/월/디바이스</label>
+                <input id="outlookUpdateMb" type="number" min="0" max="5000" step="10" value="250">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="webviewUpdateMb">WebView2 MB/월/디바이스</label>
+                <input id="webviewUpdateMb" type="number" min="0" max="5000" step="10" value="180">
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-row">
+                <label for="rolloutDays">업데이트 다운로드 집중 기간</label>
+                <input id="rolloutDays" type="number" min="1" max="30" step="1" value="1">
+              </div>
+            </div>
+            <div class="actions">
+              <button type="button" id="resetBtn">기본값 복원</button>
+              <button type="button" class="primary" id="downloadBtn">CSV 내보내기</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="results">
+        <div class="card chart-card">
+          <div class="section-title">
+            <div>
+              <h2>피크 대역폭 구성</h2>
+              <p>동시 사용량 기준으로 서비스별 필요 Mbps를 분해합니다.</p>
+            </div>
+          </div>
+          <div class="bars" id="bars"></div>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-tile">
+            <span>다운로드 중심 회선</span>
+            <strong id="downlink">0 Mbps</strong>
+            <span>OneDrive, 업데이트, 회의 수신 포함</span>
+          </div>
+          <div class="result-tile">
+            <span>업로드 중심 회선</span>
+            <strong id="uplink">0 Mbps</strong>
+            <span>회의 송신, OneDrive 업로드 포함</span>
+          </div>
+          <div class="result-tile">
+            <span>동시 회의 참가자</span>
+            <strong id="meetingUsers">0 명</strong>
+            <span>Teams Meeting 피크 산정 기준</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>상세 산정표</h2>
+              <p>용량 산정 근거를 서비스별로 확인할 수 있습니다.</p>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>피크 Mbps</th>
+                <th>월간 GB</th>
+                <th>비고</th>
+              </tr>
+            </thead>
+            <tbody id="detailRows"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>해석 가이드</h2>
+              <p>산정 결과를 네트워크 설계에 적용할 때 확인할 항목입니다.</p>
+            </div>
+          </div>
+          <ul class="note-list" id="recommendations"></ul>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>항목 설명</h2>
+              <p>각 입력값과 결과값이 산정에서 어떤 의미를 갖는지 설명합니다.</p>
+            </div>
+          </div>
+          <div class="explain-grid">
+            <div class="explain-item">
+              <strong>M365 사용자 수</strong>
+              <span>계산 대상이 되는 전체 활성 사용자입니다. 같은 사용자가 PC와 모바일을 동시에 쓰는 경우 업데이트 산정은 사용자당 디바이스 수로 보정합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>업무시간 동시 활성 비율</strong>
+              <span>업무시간 중 이메일, Teams, OneDrive를 실제로 사용하는 사용자 비율입니다. 전체 사용자가 동시에 트래픽을 만들지 않는다는 점을 반영합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>일 업무시간</strong>
+              <span>일일 이메일/채팅 트래픽이 분산되는 시간입니다. 시간이 짧을수록 같은 일일 사용량도 피크 Mbps가 커집니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>권장 여유율</strong>
+              <span>순간 피크, 사용자 증가, QoS 여유, 측정 오차를 위해 피크 산정값 위에 더하는 버퍼입니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>이메일 MB/사용자/일</strong>
+              <span>Exchange Online에서 사용자 1명이 하루에 송수신/동기화하는 평균 메일 데이터입니다. 첨부파일 사용이 많으면 크게 높여야 합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>Teams 채팅/협업 MB/일</strong>
+              <span>채팅, 채널 메시지, presence, 알림, 작은 파일 미리보기 등 회의 영상 외 Teams 협업 트래픽입니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>OneDrive 변경량 MB/일</strong>
+              <span>사용자 1명이 하루 동안 업로드/다운로드/동기화하는 파일 변경량입니다. 신규 PC 배포나 Known Folder Move 초기 동기화는 별도 대량 이벤트로 봐야 합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>OneDrive 동기화 집중 시간</strong>
+              <span>OneDrive 변경량이 실제로 몰려서 동기화되는 시간입니다. 출근 직후나 대량 파일 작업이 있으면 짧게 잡아 피크를 보수적으로 산정합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>Teams Meeting 동시 참가율</strong>
+              <span>전체 사용자 중 같은 시간대에 영상회의에 참여하는 비율입니다. 회의 트래픽은 실시간성이 높아 전체 회선 sizing에 가장 큰 영향을 줄 수 있습니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>영상 회의 품질</strong>
+              <span>Teams 공식 per-endpoint 기준의 다운로드/업로드 Mbps입니다. 일반 HD 회의는 권장값, 대형/고동작/손실 환경은 최고 성능값을 선택합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>사용자당 디바이스</strong>
+              <span>업데이트를 받는 평균 디바이스 수입니다. PC만 있으면 1, PC와 보조 장비가 함께 있으면 1보다 크게 설정합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>Teams/New Outlook/WebView2 업데이트 MB</strong>
+              <span>월간 또는 배포 주기 동안 디바이스 1대가 인터넷에서 받는 설치/업데이트 payload입니다. 실제 패키지 크기와 차등 업데이트 여부에 맞춰 조정합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>업데이트 다운로드 집중 기간</strong>
+              <span>업데이트 payload가 전체 디바이스로 확산되는 기간입니다. 짧을수록 피크가 커지고, 업데이트 링/Intune/ConfigMgr/자동 업데이트 정책에 따라 달라집니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>다운로드/업로드 중심 회선</strong>
+              <span>다운로드는 회의 수신, OneDrive 다운로드, 업데이트를 중심으로 보고 업로드는 회의 송신과 OneDrive 업로드를 중심으로 산정합니다.</span>
+            </div>
+            <div class="explain-item">
+              <strong>월간 전송량</strong>
+              <span>월 22영업일 기준의 예상 M365 관련 데이터 전송량입니다. 인터넷 회선 과금이나 월간 트래픽 규모 검토에 활용합니다.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">
+            <div>
+              <h2>기준 수치 및 출처</h2>
+              <p>공식 수치가 있는 항목과 고객 환경별 가정이 필요한 항목을 구분했습니다.</p>
+            </div>
+          </div>
+          <ul class="note-list">
+            <li><strong>Teams Meeting Video:</strong> Microsoft Teams network requirements의 회의 Video per-endpoint 기준을 사용했습니다. Minimum 150/200 Kbps up/down, Recommended 2.5/4.0 Mbps up/down, Best performance 4.0/4.0 Mbps up/down. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Town hall:</strong> eCDN 미사용 시 위치별 시청자당 약 2 Mbps, 1080p는 3 Mbps 권장값을 사용했습니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/prepare-network" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Teams 업데이트:</strong> Teams desktop client는 월 2회 업데이트되며 Windows에서는 차등 업데이트를 다운로드합니다. 업데이트 크기는 고정 공개값이 아니므로 기본 MB 값은 조정 가능한 가정입니다. <a href="https://learn.microsoft.com/en-us/microsoftteams/teams-client-update" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>WebView2:</strong> Evergreen Runtime은 자동 업데이트되며 Edge Stable 채널과 유사한 cadence를 따릅니다. Bootstrapper는 약 2 MB이나 Runtime payload는 환경별로 달라 기본 MB 값은 조정 가능한 가정입니다. <a href="https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution" target="_blank" rel="noreferrer">출처</a></li>
+            <li><strong>Exchange Online, OneDrive, Teams 채팅:</strong> Microsoft는 사용자당 고정 일일 MB를 제시하지 않습니다. 본 도구의 기본값은 초기 sizing용 예시이며, Message Trace, OneDrive Sync health, Teams admin center/CQD, 프록시/방화벽 로그로 보정해야 합니다.</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+
+    <p class="footer">
+      이 계산기는 초기 sizing과 고객 대화용 예측 도구입니다. 실제 회선 설계 시 Microsoft 365 네트워크 연결 원칙, QoS, 프록시 우회, 로컬 인터넷 breakout, 사용량 로그를 함께 검토하세요.
+    </p>
+  </main>
+
+  <script>
+    const defaults = {
+      users: 1000,
+      activePercent: 70,
+      workHours: 8,
+      safetyMargin: 30,
+      emailMb: 75,
+      teamsChatMb: 50,
+      oneDriveMb: 300,
+      syncWindow: 4,
+      meetingPercent: 12,
+      videoProfile: "4,2.5",
+      devicesPerUser: 1,
+      teamsUpdateMb: 350,
+      outlookUpdateMb: 250,
+      webviewUpdateMb: 180,
+      rolloutDays: 1
+    };
+
+    const ids = Object.keys(defaults);
+    const elements = Object.fromEntries(ids.map((id) => [id, document.getElementById(id)]));
+    const numberFormat = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 });
+    const intFormat = new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 0 });
+
+    const mbToMbps = (mb, hours) => (mb * 8) / (hours * 3600);
+    const gb = (mb) => mb / 1024;
+    const tb = (gbValue) => gbValue / 1024;
+    const safeNumber = (value, fallback = 0) => {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
+    const formatMbps = (value) => `${numberFormat.format(value)} Mbps`;
+    const formatGb = (value) => `${numberFormat.format(value)} GB`;
+    const formatTb = (value) => `${numberFormat.format(value)} TB`;
+    const parseVideoProfile = (value) => {
+      const [down, up] = String(value).split(",").map((part) => safeNumber(part, 0));
+      return { down: Math.max(0, down), up: Math.max(0, up) };
+    };
+
+    function getInputs() {
+      return {
+        users: Math.max(1, safeNumber(elements.users.value, defaults.users)),
+        activePercent: safeNumber(elements.activePercent.value, defaults.activePercent),
+        workHours: Math.max(1, safeNumber(elements.workHours.value, defaults.workHours)),
+        safetyMargin: safeNumber(elements.safetyMargin.value, defaults.safetyMargin),
+        emailMb: Math.max(0, safeNumber(elements.emailMb.value, defaults.emailMb)),
+        teamsChatMb: Math.max(0, safeNumber(elements.teamsChatMb.value, defaults.teamsChatMb)),
+        oneDriveMb: Math.max(0, safeNumber(elements.oneDriveMb.value, defaults.oneDriveMb)),
+        syncWindow: Math.max(0.5, safeNumber(elements.syncWindow.value, defaults.syncWindow)),
+        meetingPercent: safeNumber(elements.meetingPercent.value, defaults.meetingPercent),
+        videoProfile: elements.videoProfile.value,
+        videoBandwidth: parseVideoProfile(elements.videoProfile.value),
+        devicesPerUser: Math.max(0, safeNumber(elements.devicesPerUser.value, defaults.devicesPerUser)),
+        teamsUpdateMb: Math.max(0, safeNumber(elements.teamsUpdateMb.value, defaults.teamsUpdateMb)),
+        outlookUpdateMb: Math.max(0, safeNumber(elements.outlookUpdateMb.value, defaults.outlookUpdateMb)),
+        webviewUpdateMb: Math.max(0, safeNumber(elements.webviewUpdateMb.value, defaults.webviewUpdateMb)),
+        rolloutDays: Math.max(1, safeNumber(elements.rolloutDays.value, defaults.rolloutDays))
+      };
+    }
+
+    function calculate(input) {
+      const activeUsers = input.users * (input.activePercent / 100);
+      const meetingUsers = input.users * (input.meetingPercent / 100);
+      const meetingDownPeak = meetingUsers * input.videoBandwidth.down;
+      const meetingUpPeak = meetingUsers * input.videoBandwidth.up;
+      const updateMbPerDevice = input.teamsUpdateMb + input.outlookUpdateMb + input.webviewUpdateMb;
+      const devices = input.users * input.devicesPerUser;
+      const updateDailyMbDuringRollout = (devices * updateMbPerDevice) / input.rolloutDays;
+
+      const emailPeak = mbToMbps(activeUsers * input.emailMb, input.workHours) * 3;
+      const chatPeak = mbToMbps(activeUsers * input.teamsChatMb, input.workHours) * 2.5;
+      const oneDrivePeak = mbToMbps(input.users * input.oneDriveMb, input.syncWindow) * 1.8;
+      const updatePeak = mbToMbps(updateDailyMbDuringRollout, input.workHours) * 2.2;
+      const miscPeak = (emailPeak + chatPeak + oneDrivePeak) * 0.08;
+
+      const rows = [
+        {
+          name: "Exchange Online 이메일",
+          peak: emailPeak,
+          monthlyGb: gb(input.users * input.emailMb * 22),
+          note: "업무시간 평균의 3배 피크"
+        },
+        {
+          name: "Teams 채팅/협업",
+          peak: chatPeak,
+          monthlyGb: gb(input.users * input.teamsChatMb * 22),
+          note: "메시지, 파일 미리보기, 알림"
+        },
+        {
+          name: "OneDrive 동기화",
+          peak: oneDrivePeak,
+          monthlyGb: gb(input.users * input.oneDriveMb * 22),
+          note: `${input.syncWindow}시간 집중 동기화`
+        },
+        {
+          name: "Teams Meeting Video",
+          peak: meetingDownPeak,
+          monthlyGb: gb((meetingDownPeak + meetingUpPeak) * 3600 * input.workHours * 22 / 8),
+          note: `${intFormat.format(meetingUsers)}명 동시, Down ${input.videoBandwidth.down} / Up ${input.videoBandwidth.up} Mbps`
+        },
+        {
+          name: "Teams/New Outlook/WebView2 업데이트",
+          peak: updatePeak,
+          monthlyGb: gb(devices * updateMbPerDevice),
+          note: `${input.rolloutDays}일 집중 다운로드`
+        },
+        {
+          name: "기타 M365 제어/인증 트래픽",
+          peak: miscPeak,
+          monthlyGb: gb((input.users * 20) * 22),
+          note: "인증, Graph, telemetry, small payload"
+        }
+      ];
+
+      const peak = rows.reduce((sum, row) => sum + row.peak, 0);
+      const monthlyGb = rows.reduce((sum, row) => sum + row.monthlyGb, 0);
+      const recommended = peak * (1 + input.safetyMargin / 100);
+      const downlink = recommended;
+      const uplink = (meetingUpPeak + oneDrivePeak * 0.35 + emailPeak * 0.2 + chatPeak * 0.2) * (1 + input.safetyMargin / 100);
+
+      return {
+        rows,
+        activeUsers,
+        meetingUsers,
+        meetingDownPeak,
+        meetingUpPeak,
+        peak,
+        monthlyGb,
+        recommended,
+        downlink,
+        uplink,
+        updatePeak,
+        perUserMbps: recommended / input.users
+      };
+    }
+
+    function renderBars(rows) {
+      const container = document.getElementById("bars");
+      const max = Math.max(...rows.map((row) => row.peak), 1);
+      container.innerHTML = rows.map((row) => {
+        const width = Math.max(1, (row.peak / max) * 100);
+        return `
+          <div class="bar-row">
+            <div class="bar-name">${row.name}</div>
+            <div class="bar-track" title="${formatMbps(row.peak)}">
+              <div class="bar-fill" style="width: ${width}%"></div>
+            </div>
+            <div class="bar-number">${formatMbps(row.peak)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderTable(rows) {
+      document.getElementById("detailRows").innerHTML = rows.map((row) => `
+        <tr>
+          <td>${row.name}</td>
+          <td>${formatMbps(row.peak)}</td>
+          <td>${formatGb(row.monthlyGb)}</td>
+          <td>${row.note}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderRecommendations(input, result) {
+      const notes = [];
+      if (input.meetingPercent >= 25) {
+        notes.push("<strong>Teams 회의 비중이 높습니다.</strong> 회의 트래픽은 실시간성이 중요하므로 Teams/Skype Optimize 엔드포인트는 프록시 검사보다 로컬 인터넷 breakout과 QoS를 우선 검토하세요.");
+      } else {
+        notes.push("<strong>일반 회의 사용 패턴입니다.</strong> 동시 회의 참가율이 변하면 전체 권장 용량이 크게 달라지므로 실제 Teams CQD 또는 네트워크 로그로 보정하세요.");
+      }
+
+      notes.push("<strong>업데이트는 1일 집중 기준으로 산정합니다.</strong> 실제 환경에서 업데이트 링이나 배포 도구로 분산 배포한다면 다운로드 집중 기간을 조정해 피크를 낮출 수 있습니다.");
+
+      if (result.perUserMbps > 2) {
+        notes.push("<strong>사용자당 권장 Mbps가 높은 편입니다.</strong> OneDrive 대량 동기화, 영상 회의 품질, 업데이트 배포 시간을 분산하는 정책을 검토하세요.");
+      } else {
+        notes.push("<strong>사용자당 권장 Mbps는 일반 범위입니다.</strong> 다만 무선 AP, 방화벽 처리량, SSL inspection 예외, DNS locality도 함께 확인해야 합니다.");
+      }
+
+      notes.push("<strong>회선 산정 기준입니다.</strong> 본 값은 M365 관련 인터넷 대역폭이며, 다른 SaaS, 인터넷 browsing, 백업, VDI 트래픽은 별도로 더해야 합니다.");
+      document.getElementById("recommendations").innerHTML = notes.map((note) => `<li>${note}</li>`).join("");
+    }
+
+    function renderStatus(input, result) {
+      const status = document.getElementById("sizingStatus");
+      status.classList.remove("warn", "danger");
+      if (result.perUserMbps >= 3 || input.meetingPercent >= 35) {
+        status.textContent = "고부하";
+        status.classList.add("danger");
+      } else if (result.perUserMbps >= 1.5) {
+        status.textContent = "주의";
+        status.classList.add("warn");
+      } else {
+        status.textContent = "정상";
+      }
+    }
+
+    function updateRangeLabels() {
+      document.getElementById("activePercentValue").textContent = elements.activePercent.value;
+      document.getElementById("meetingPercentValue").textContent = elements.meetingPercent.value;
+    }
+
+    function render() {
+      updateRangeLabels();
+      const input = getInputs();
+      const result = calculate(input);
+      document.getElementById("recommendedBandwidth").textContent = formatMbps(result.recommended);
+      document.getElementById("peakDemand").textContent = formatMbps(result.peak);
+      document.getElementById("monthlyVolume").textContent = formatTb(tb(result.monthlyGb));
+      document.getElementById("perUserMbps").textContent = formatMbps(result.perUserMbps);
+      document.getElementById("updatePeak").textContent = formatMbps(result.updatePeak);
+      document.getElementById("downlink").textContent = formatMbps(result.downlink);
+      document.getElementById("uplink").textContent = formatMbps(result.uplink);
+      document.getElementById("meetingUsers").textContent = `${intFormat.format(result.meetingUsers)} 명`;
+      renderBars(result.rows);
+      renderTable(result.rows);
+      renderRecommendations(input, result);
+      renderStatus(input, result);
+      window.currentSizing = { input, result };
+    }
+
+    function resetDefaults() {
+      for (const [id, value] of Object.entries(defaults)) {
+        if (elements[id]) elements[id].value = value;
+      }
+      render();
+    }
+
+    function downloadCsv() {
+      const { input, result } = window.currentSizing || { input: getInputs(), result: calculate(getInputs()) };
+      const lines = [
+        ["구분", "값"],
+        ["사용자 수", input.users],
+        ["권장 확보 용량 Mbps", result.recommended.toFixed(2)],
+        ["예상 피크 Mbps", result.peak.toFixed(2)],
+        ["월간 전송량 GB", result.monthlyGb.toFixed(2)],
+        [],
+        ["서비스", "피크 Mbps", "월간 GB", "비고"],
+        ...result.rows.map((row) => [row.name, row.peak.toFixed(2), row.monthlyGb.toFixed(2), row.note])
+      ];
+      const csv = lines.map((line) => line.map((cell) => `"${String(cell ?? "").replaceAll("\"", "\"\"")}"`).join(",")).join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `m365-bandwidth-sizing-${input.users}-users.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    for (const element of Object.values(elements)) {
+      element.addEventListener("input", render);
+      element.addEventListener("change", render);
+    }
+    document.getElementById("resetBtn").addEventListener("click", resetDefaults);
+    document.getElementById("downloadBtn").addEventListener("click", downloadCsv);
+    render();
+  </script>
+</body>
+</html>
