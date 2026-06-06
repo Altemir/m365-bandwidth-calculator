@@ -602,6 +602,7 @@
             <li>Teams 회의, OneDrive 초기 동기화, 업데이트 다운로드가 같은 시간대에 겹치면 피크가 크게 증가할 수 있습니다.</li>
             <li>지점별 인터넷 breakout, 프록시/SSL inspection, 방화벽 처리량, Wi-Fi 품질, QoS 정책에 따라 체감 품질은 달라질 수 있습니다.</li>
             <li>본 계산은 M365 관련 트래픽만 포함하며, 일반 웹 browsing, 다른 SaaS, 백업, VDI, 보안 에이전트 트래픽은 별도로 더해야 합니다.</li>
+            <li>기본 수치는 일반적인 예시이며, 기업마다 솔루션 사용률과 사용 방식에 따라 크게 달라질 수 있으므로 내부 로그를 확인해 반영하는 것을 권장합니다.</li>
           </ul>
         </div>
         <div class="pill-row">
@@ -750,19 +751,19 @@
             <div class="field">
               <div class="field-row">
                 <label for="teamsUpdateMb">Teams 업데이트 MB/월/디바이스</label>
-                <input id="teamsUpdateMb" type="number" min="0" max="5000" step="10" value="350">
+                <input id="teamsUpdateMb" type="number" min="0" max="5000" step="10" value="250">
               </div>
             </div>
             <div class="field">
               <div class="field-row">
                 <label for="outlookUpdateMb">New Outlook MB/월/디바이스</label>
-                <input id="outlookUpdateMb" type="number" min="0" max="5000" step="10" value="250">
+                <input id="outlookUpdateMb" type="number" min="0" max="5000" step="10" value="360">
               </div>
             </div>
             <div class="field">
               <div class="field-row">
                 <label for="webviewUpdateMb">WebView2 MB/월/디바이스</label>
-                <input id="webviewUpdateMb" type="number" min="0" max="5000" step="10" value="180">
+                <input id="webviewUpdateMb" type="number" min="0" max="5000" step="10" value="30">
               </div>
             </div>
             <div class="field">
@@ -945,9 +946,9 @@
       meetingPercent: 12,
       videoProfile: "4,2.5",
       devicesPerUser: 1,
-      teamsUpdateMb: 350,
-      outlookUpdateMb: 250,
-      webviewUpdateMb: 180,
+      teamsUpdateMb: 250,
+      outlookUpdateMb: 360,
+      webviewUpdateMb: 30,
       rolloutDays: 1
     };
 
